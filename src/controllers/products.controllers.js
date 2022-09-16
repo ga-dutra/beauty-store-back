@@ -9,7 +9,7 @@ async function list(req, res) {
     res.status(200).send(products);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.status(500).send(error.message);
   }
 }
 
@@ -25,7 +25,7 @@ async function postProducts(req, res) {
     res.status(201).send({ message: "Products list created in database" });
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.status(500).send(error.message);
   }
 }
 
