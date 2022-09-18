@@ -2,9 +2,9 @@ import express from 'express';
 import { checkNewUser, checkUserLogin } from '../schemas/auth.schemas.js';
 import { postUser, postLogin } from '../controllers/auth.controllers.js';
 
-const authRouter = express.Router();
+const router = express.Router();
 
-authRouter.post('/sign-up', checkNewUser, postUser);
-authRouter.post('/login', checkUserLogin, postLogin);
+router.post('/sign-up', checkNewUser, postUser);
+router.post('/login', checkUserLogin, postLogin);
 
-export default authRouter;
+export default router;
