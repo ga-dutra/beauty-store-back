@@ -36,8 +36,56 @@ async function listWishList(req, res) {
 
     return res.status(200).send(userWishList);
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error.message);
   }
 }
 
-export { postWishList, listWishList };
+async function postItemInCart(req, res) {
+  const productId = req.headers.product;
+  const user = res.locals.user;
+
+  try {
+    const productIsOnTheList = await db.collection("cartList").findOne({
+      _id: productId,
+      userId: user._id,
+    });
+
+    if (productIsOnTheList) {
+      await db.collection("cartList").deleteOne({
+        _id: productId,
+        userId: user._id,
+      });
+
+      return res.status(200).send("delete");
+    } else {
+      await db.collection("cartList").insertOne({
+        _id: productId,
+        userId: user._id,
+      });
+
+      return res.status(200).send("insert");
+    }
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+async function getCartList(req, res) {
+  const user = res.locals.user;
+
+  try {
+    const idOfProductsInCart = await db
+      .collection("cartList")
+      .find({ userId: user._id })
+      .toArray();
+    const productDetailsInCart = idOfProductsInCart.map(async (id) => {
+      await db.collection("products").findOne({ _id: id });
+    });
+    res.status(200).send(productDetailsInCart);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export { postWishList, listWishList, postItemInCart, getCartList };

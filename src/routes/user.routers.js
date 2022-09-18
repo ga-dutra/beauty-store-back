@@ -1,9 +1,16 @@
 import express from "express";
-import { listWishList, postWishList } from "../controllers/user.controllers";
-import { tokenMiddleware } from "../middlewares/token.middlewares";
+import {
+  postWishList,
+  listWishList,
+  postItemInCart,
+  getCartList,
+} from "../controllers/user.controllers.js";
+import { checkToken } from "../middlewares/token.middlewares.js";
 
 const router = express.Router();
-router.get("/wishlist", listWishList);
-router.post("/wishlist", tokenMiddleware, postWishList);
+router.post("/wish-list", checkToken, postWishList);
+router.get("/wish-list", checkToken, listWishList);
+router.post("/cart-list", checkToken, postItemInCart);
+router.get("/cart-list", checkToken, getCartList);
 
 export default router;

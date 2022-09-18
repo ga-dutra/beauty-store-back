@@ -1,32 +1,29 @@
-import db from "../database/db";
+import db from "../database/db.js";
 
-async function tokenMiddleware(req, res, next) {
-  const token = req.headers.authorization?.replace("Bearer ", "");
+async function checkToken(req, res, next) {
+  const authorization = req.headers.authorization;
+  const token = authorization?.replace("Bearer ", "");
+  if (!token)
+    return res
+      .status(401)
+      .send("É necessário estar logado para acessar esta página!");
 
-  if (!token) {
-    return res.status(401).send({ error: "Token is required!" });
-  }
+  const session = await db.collection("sessions").findOne({ token });
+  if (!session)
+    return res
+      .status(401)
+      .send("É necessário estar logado para acessar esta página!");
 
-  try {
-    const session = await db.collection("sessions").findOne({
-      token,
-    });
+  const user = await db.collection("users").findOne({ _id: session.userId });
+  if (!user)
+    return res
+      .status(401)
+      .send("É necessário estar logado para acessar esta página!");
 
-    if (!session) {
-      return res.status(404).send({ error: "Session not found!" });
-    }
+  delete user.password;
 
-    const user = await db.collection("users").findOne({
-      _id: session.userId,
-    });
-
-    res.locals.session = session;
-    res.locals.user = user;
-    next();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send(error.message);
-  }
+  res.locals.user = user;
+  next();
 }
 
-export { tokenMiddleware };
+export { checkToken };
