@@ -1,23 +1,23 @@
 import db from "../database/db.js";
 
 async function postWishList(req, res) {
-  const { session, user } = res.locals;
-  const productName = req.name;
+  const { user } = res.locals;
+  const productName = req.productName;
 
   try {
     const wishedProduct = await db
-      .collection("wishlist")
+      .collection("wishList")
       .findOne({ name: productName });
     if (wishedProduct) {
     }
     if (!wishedProduct) {
       const wishedProduct = {
-        userId: req.user._id,
+        userId: user._id,
         product: req.productId,
       };
     }
 
-    await db.collection("wishlist").insertOne(wishedProduct);
+    await db.collection("wishList").insertOne(wishedProduct);
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
@@ -30,7 +30,7 @@ async function listWishList(req, res) {
 
   try {
     const userWishList = await db
-      .collection("wishlist")
+      .collection("wishList")
       .find({ userId: user._id })
       .toArray();
 
