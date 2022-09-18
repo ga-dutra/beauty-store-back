@@ -11,27 +11,32 @@ async function postWishList(req, res) {
 }
 
 async function postItemInCart(req, res) {
-  const product = req.headers.product;
+  const productId = req.headers.product;
   const user = res.locals.user;
 
   try {
     const productIsOnTheList = await db.collection("cartList").findOne({
-      _id: product._id,
+      _id: productId,
       userId: user._id
     });
 
     if (productIsOnTheList) {
       await db.collection('cartList').deleteOne({
-        _id: product._id,
+        _id: productId,
         userId: user._id
       });
 
+      return res.status(200).send('delete');
+
     } else {
       await db.collection('cartList').insertOne({
-        _id: product._id,
+        _id: productId,
         userId: user._id
       });
+
+      return res.status(200).send('insert');
     }
+
   } catch (error) {
     return res.status(500).send(error.message);
   }
