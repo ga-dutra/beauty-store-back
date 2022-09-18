@@ -25,7 +25,7 @@ async function postItemInCart(req, res) {
         _id: product._id,
         userId: user._id
       });
-      
+
     } else {
       await db.collection('cartList').insertOne({
         _id: product._id,
@@ -37,4 +37,19 @@ async function postItemInCart(req, res) {
   }
 }
 
-export { postWishList, postItemInCart };
+async function getCartList(req, res) {
+  const user = res.locals.user;
+
+  try {
+    const idOfProductsInCart = await db.collection('cartList').find({ userId: user._id }).toArray();
+    const productDetailsInCart = idOfProductsInCart.map(async (id) => {
+      await db.collection('products').findOne({ _id: id });
+    });
+    res.status(200).send(productDetailsInCart);
+
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export { postWishList, postItemInCart, getCartList };
