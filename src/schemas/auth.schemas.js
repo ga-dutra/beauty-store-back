@@ -1,5 +1,4 @@
 import joi from "joi";
-import sanitizeItems from "../utils/data.sanitization.js";
 
 const newUserSchema = joi.object({
   name: joi.string().empty(" ").required(),
@@ -13,8 +12,7 @@ const userLoginSchema = joi.object({
 });
 
 async function checkNewUser(req, res, next) {
-  const sanitizedBody = sanitizeItems(req.body);
-  const validation = newUserSchema.validate(sanitizedBody, {
+  const validation = newUserSchema.validate(req.body, {
     abortEarly: false,
   });
   const password = req.body.password;
@@ -36,8 +34,7 @@ async function checkNewUser(req, res, next) {
 }
 
 async function checkUserLogin(req, res, next) {
-  const sanitizedBody = sanitizeItems(req.body);
-  const validation = userLoginSchema.validate(sanitizedBody, {
+  const validation = userLoginSchema.validate(req.body, {
     abortEarly: false,
   });
 
