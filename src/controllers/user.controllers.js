@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import db from "../database/db.js";
+import { confirmedOrderEmail } from "../utils/emailResponse.js";
 
 async function postWishList(req, res) {
   const { user } = res.locals;
@@ -102,4 +103,17 @@ async function getCartList(req, res) {
   }
 }
 
-export { postWishList, listWishList, postItemInCart, getCartList };
+async function postOrder(req, res) {
+  const user = res.locals.user;
+
+  try {
+    await db
+      .collection("orders")
+      .insertOne({ userId: user._id, orderDate: Date.now() });
+    confirmedOrderEmail(user.email, user.name);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export { postWishList, listWishList, postItemInCart, getCartList, postOrder };
