@@ -1,5 +1,5 @@
 import joi from "joi";
-import sanitizeItems from "../utils/data.sanitization";
+import sanitizeItems from "../utils/data.sanitization.js";
 
 const newUserSchema = joi.object({
   name: joi.string().empty(" ").required(),
