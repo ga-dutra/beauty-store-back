@@ -92,7 +92,7 @@ async function getCartList(req, res) {
     let productDetailsInCart = [];
 
     idOfProductsInCart.map(async (userProduct) => {
-      const product = await db.collection('products').findOne({ _id: ObjectId(userProduct._id) });
+      const product = await db.collection('products').findOne({ _id: ObjectId(Number(userProduct._id)) });
       productDetailsInCart.push(product);
     });
 
