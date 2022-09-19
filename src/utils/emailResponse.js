@@ -1,11 +1,11 @@
-import { createRequire } from "module";
 import dotenv from "dotenv";
-
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 dotenv.config();
 
 function signUpEmail(email) {
+  console.log("email requisitado");
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const msg = {

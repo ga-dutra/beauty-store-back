@@ -1,7 +1,7 @@
 import db from "../database/db.js";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import signUpEmail from "../utils/emailResponse.js";
+import { signUpEmail } from "../utils/emailResponse.js";
 
 async function postUser(req, res) {
   const { name, email, password } = req.body;
