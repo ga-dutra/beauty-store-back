@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import db from "../database/db.js";
 
 async function postWishList(req, res) {
@@ -91,7 +92,7 @@ async function getCartList(req, res) {
     let productDetailsInCart = [];
 
     idOfProductsInCart.map(async (userProduct) => {
-      const product = await db.collection('products').findOne({ _id: userProduct._id });
+      const product = await db.collection('products').findOne({ _id: ObjectId(userProduct._id) });
       productDetailsInCart.push(product);
     });
 
