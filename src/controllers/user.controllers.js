@@ -88,16 +88,20 @@ async function getCartList(req, res) {
   const user = res.locals.user;
 
   try {
-    const idOfProductsInCart = await db.collection('cartList').find({ userId: user._id }).toArray();
+    const idOfProductsInCart = await db
+      .collection("cartList")
+      .find({ userId: user._id })
+      .toArray();
     let productDetailsInCart = [];
 
     idOfProductsInCart.map(async (userProduct) => {
-      const product = await db.collection('products').findOne({ _id: ObjectId(Number(userProduct._id)) });
+      const product = await db
+        .collection("products")
+        .findOne({ _id: ObjectId(Number(userProduct._id)) });
       productDetailsInCart.push(product);
     });
 
     res.status(200).send(productDetailsInCart);
-    
   } catch (error) {
     return res.status(500).send(error.message);
   }
