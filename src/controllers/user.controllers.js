@@ -89,11 +89,10 @@ async function getCartList(req, res) {
 
   try {
     const idOfProductsInCart = await db.collection('cartList').find({ userId: user._id }).toArray();
-    let productDetailsInCart = [];
 
-    idOfProductsInCart.map(async (userProduct) => {
-      const product = await db.collection('products').findOne({ _id: ObjectId(Number(userProduct._id)) });
-      productDetailsInCart.push(product);
+    const productDetailsInCart = idOfProductsInCart.map(async (userProduct) => {
+      const product = await db.collection('products').findOne({ _id: ObjectId(userProduct._id) });
+      return product;
     });
 
     res.status(200).send(productDetailsInCart);
