@@ -1,9 +1,52 @@
 import db from "../database/db.js";
 
 async function postWishList(req, res) {
+  const { user } = res.locals;
+  const productName = req.productName;
+
   try {
-    const wishedProduct = await db.collection("wishlist").findOne({});
-    await db.collection("wishlist").insertOne({});
+    const wishedProduct = await db
+      .collection("products")
+      .findOne({ name: productName });
+    if (!wishedProduct) {
+      return res.status(404).send({ error: "O produto não existe!" });
+    }
+
+    const userWishedProduct = {
+      userId: user._id,
+      productId: wishedProduct._id,
+    };
+
+    const isInWishList = await db
+      .collection("wishList")
+      .findOne(userWishedProduct);
+
+    if (isInWishList) {
+      await db.collection("wishList").deleteOne({
+        _id: isInWishList._id,
+        userId: user._id,
+      });
+      return res.status(200).send("product deleted on wish-list");
+    } else {
+      await db.collection("wishList").insertOne(wishedProduct);
+      return res.status(201).send("product inserted on wish-list");
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message);
+  }
+}
+
+async function listWishList(req, res) {
+  const user = res.locals;
+
+  try {
+    const userWishList = await db
+      .collection("wishList")
+      .find({ userId: user._id })
+      .toArray();
+
+    return res.status(200).send(userWishList);
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message);
@@ -17,26 +60,24 @@ async function postItemInCart(req, res) {
   try {
     const productIsOnTheList = await db.collection("cartList").findOne({
       _id: productId,
-      userId: user._id
+      userId: user._id,
     });
 
     if (productIsOnTheList) {
-      await db.collection('cartList').deleteOne({
+      await db.collection("cartList").deleteOne({
         _id: productId,
-        userId: user._id
+        userId: user._id,
       });
 
-      return res.status(200).send('delete');
-
+      return res.status(200).send("product deleted on cart-list");
     } else {
-      await db.collection('cartList').insertOne({
+      await db.collection("cartList").insertOne({
         _id: productId,
-        userId: user._id
+        userId: user._id,
       });
 
-      return res.status(200).send('insert');
+      return res.status(201).send("product inserted on cart-list");
     }
-
   } catch (error) {
     return res.status(500).send(error.message);
   }
@@ -46,15 +87,17 @@ async function getCartList(req, res) {
   const user = res.locals.user;
 
   try {
-    const idOfProductsInCart = await db.collection('cartList').find({ userId: user._id }).toArray();
+    const idOfProductsInCart = await db
+      .collection("cartList")
+      .find({ userId: user._id })
+      .toArray();
     const productDetailsInCart = idOfProductsInCart.map(async (id) => {
-      await db.collection('products').findOne({ _id: id });
+      await db.collection("products").findOne({ _id: id });
     });
     res.status(200).send(productDetailsInCart);
-
   } catch (error) {
     return res.status(500).send(error.message);
   }
 }
 
-export { postWishList, postItemInCart, getCartList };
+export { postWishList, listWishList, postItemInCart, getCartList };
