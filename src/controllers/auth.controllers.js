@@ -15,7 +15,7 @@ async function postUser(req, res) {
         email,
         password: passwordHash,
       });
-      signUpEmail(email);
+      signUpEmail(email.email);
       return res.sendStatus(201);
     } catch (error) {
       return res.status(500).send(error.message);

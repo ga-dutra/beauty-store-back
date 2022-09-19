@@ -14,7 +14,7 @@ function signUpEmail(email) {
   };
   sgMail.send(msg).then(
     () => {
-      console.log("e-mail sent");
+      console.log("e-mail sent to " + email);
     },
     (error) => {
       console.error(error);
