@@ -6,19 +6,31 @@ async function postWishList(req, res) {
 
   try {
     const wishedProduct = await db
-      .collection("wishList")
+      .collection("products")
       .findOne({ name: productName });
-    if (wishedProduct) {
-    }
     if (!wishedProduct) {
-      const wishedProduct = {
-        userId: user._id,
-        product: req.productId,
-      };
+      return res.status(404).send({ error: "O produto não existe!" });
     }
 
-    await db.collection("wishList").insertOne(wishedProduct);
-    res.sendStatus(201);
+    const userWishedProduct = {
+      userId: user._id,
+      productId: wishedProduct._id,
+    };
+
+    const isInWishList = await db
+      .collection("wishList")
+      .findOne(userWishedProduct);
+
+    if (isInWishList) {
+      await db.collection("wishList").deleteOne({
+        _id: isInWishList._id,
+        userId: user._id,
+      });
+      return res.status(200).send("product deleted on wish-list");
+    } else {
+      await db.collection("wishList").insertOne(wishedProduct);
+      return res.status(201).send("product inserted on wish-list");
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).send(error.message);
@@ -57,14 +69,14 @@ async function postItemInCart(req, res) {
         userId: user._id,
       });
 
-      return res.status(200).send("delete");
+      return res.status(200).send("product deleted on cart-list");
     } else {
       await db.collection("cartList").insertOne({
         _id: productId,
         userId: user._id,
       });
 
-      return res.status(200).send("insert");
+      return res.status(201).send("product inserted on cart-list");
     }
   } catch (error) {
     return res.status(500).send(error.message);
