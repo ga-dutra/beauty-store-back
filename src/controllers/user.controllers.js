@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import db from "../database/db.js";
+import { confirmedOrderEmail } from "../utils/emailResponse.js";
 
 async function postWishList(req, res) {
   const { user } = res.locals;
@@ -92,13 +93,12 @@ async function getCartList(req, res) {
       .collection("cartList")
       .find({ userId: user._id })
       .toArray();
-    let productDetailsInCart = [];
 
-    idOfProductsInCart.map(async (userProduct) => {
+    const productDetailsInCart = idOfProductsInCart.map(async (userProduct) => {
       const product = await db
         .collection("products")
-        .findOne({ _id: ObjectId(Number(userProduct._id)) });
-      productDetailsInCart.push(product);
+        .findOne({ _id: ObjectId(userProduct._id) });
+      return product;
     });
 
     res.status(200).send(productDetailsInCart);
@@ -107,4 +107,17 @@ async function getCartList(req, res) {
   }
 }
 
-export { postWishList, listWishList, postItemInCart, getCartList };
+async function postOrder(req, res) {
+  const user = res.locals.user;
+
+  try {
+    await db
+      .collection("orders")
+      .insertOne({ userId: user._id, orderDate: Date.now() });
+    confirmedOrderEmail(user.email, user.name);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export { postWishList, listWishList, postItemInCart, getCartList, postOrder };

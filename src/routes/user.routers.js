@@ -7,6 +7,7 @@ import {
   postOrder,
 } from "../controllers/user.controllers.js";
 import { checkToken } from "../middlewares/token.middlewares.js";
+import { confirmedOrderEmail } from "../utils/emailResponse.js";
 
 const router = express.Router();
 router.post("/wish-list", checkToken, postWishList);
